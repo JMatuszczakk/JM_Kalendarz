@@ -1,9 +1,6 @@
 # This is a simple calendar app for sharing with my family
 import streamlit as st
 import pandas as pd
-import mysql as mysql
-import mysql.connector
-from mysql.connector import Error
 from supabase import create_client, Client
 
 # Connect to the database
@@ -16,22 +13,10 @@ def init_connection():
 
 supabase = init_connection()
 
-try:
-    connection = mysql.connector.connect(
-        host= st.secrets['host'],
-        database= st.secrets['database'],
-        user= st.secrets['user'],
-        password= st.secrets['password']
 
-
-    )
-except Error as e:
-    print(e)
 
 
 # Create a cursor object
-cursor = connection.cursor()
-cursor.execute("SELECT * FROM kalendarz")
 # Fetch all the records
 result = supabase.table('events').select('*').execute()
 #format is ('data', [{'id': 1, 'event_name': 'test1', 'event_date_start': None, 'event_date_end': '2023-08-25 20:05:52'}])
@@ -83,7 +68,8 @@ for _, row in df.iterrows():
         "end": str(row["ev_date_stop"]),    # Convert the date to string format
     }
     calendar_events.append(calendar_event)
-print(calendar_event)
+
+
 
 # Display the interactive calendar
 from streamlit_calendar import calendar
