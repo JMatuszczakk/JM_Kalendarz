@@ -39,6 +39,7 @@ from streamlit_calendar import calendar
 calendar_options = {
     "initialView": "dayGridWeek",  # Set the view to "week"
     "locale": "pl",                # Set locale to Polish
+    "firstDay": 1
 }
 
 # Create the calendar widget using the dynamically generated events and options
