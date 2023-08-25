@@ -4,6 +4,7 @@ import pandas as pd
 from supabase import create_client, Client
 #import datetime
 from datetime import datetime, timedelta
+import simplepush
 
 # Connect to the database
 
@@ -43,7 +44,7 @@ result = supabase.table('events').select('*').execute()
 df = pd.DataFrame(result.data)
 df = df.rename(columns={'event_name': 'ev_name', 'event_date_start': 'ev_date_start', 'event_date_end': 'ev_date_stop'})
 
-
+print(df)
 st.title('Kalendasz')
 st.subheader("Nadchodzące wydarzenia")
 upc = []
@@ -78,10 +79,10 @@ with st.form('dodaj_wydarzenie'):
         supabase.table('events').insert([{'event_name': event_name, 'event_date_start': event_str_start, 'event_date_end': event_str_stop}]).execute()
         st.success('Wydarzenie dodane')
         st.balloons()
+        simplepush.send(key='uSndSj', title='Dodano nowe wydarzenie', message='Dodano wydarzenie: ' + event_name + ' na dzień ' + str(event_date) + ' o godzinie ' + str(event_time) + '.')
         st.experimental_rerun()
 
 # Convert DataFrame entries to calendar_events format
-
 calendar_events = []
 for _, row in df.iterrows():
     calendar_event = {
@@ -91,7 +92,7 @@ for _, row in df.iterrows():
     }
     calendar_events.append(calendar_event)
 
-
+print(calendar_events)
 
 # Display the interactive calendar
 from streamlit_calendar import calendar
