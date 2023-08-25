@@ -4,32 +4,58 @@ import pandas as pd
 import mysql as mysql
 import mysql.connector
 from mysql.connector import Error
+from supabase import create_client, Client
 
 # Connect to the database
+
+@st.cache_resource
+def init_connection():
+    url = st.secrets["supabase_url"]
+    key = st.secrets["supabase_key"]
+    return create_client(url, key)
+
+supabase = init_connection()
+
 try:
     connection = mysql.connector.connect(
         host= st.secrets['host'],
         database= st.secrets['database'],
         user= st.secrets['user'],
         password= st.secrets['password']
-        
+
 
     )
 except Error as e:
     print(e)
 
-    
+
 # Create a cursor object
 cursor = connection.cursor()
 cursor.execute("SELECT * FROM kalendarz")
 # Fetch all the records
-result = cursor.fetchall()
-# Print the result
-for row in result:
-    print(row)
+result = supabase.table('events').select('*').execute()
+#format is ('data', [{'id': 1, 'event_name': 'test1', 'event_date_start': None, 'event_date_end': '2023-08-25 20:05:52'}])
 
-#create df from result
-df = pd.DataFrame(result, columns=['id', 'ev_name', 'ev_date_start', 'ev_date_stop'])
+#format of result.data is
+# [{
+#   "id": 1,
+#   "event_name": "test1",
+#   "event_date_start": null,
+#   "event_date_end": "2023-08-25 20:05:52"
+# },
+# {
+#   "id": 2,
+#   "event_name": "makapaka1",
+#   "event_date_start": "2023-08-25T21:15:00",
+#   "event_date_end": "2023-08-25T22:15:00"
+# }
+# ]
+
+
+#create df from result.data
+df = pd.DataFrame(result.data)
+df = df.rename(columns={'event_name': 'ev_name', 'event_date_start': 'ev_date_start', 'event_date_end': 'ev_date_stop'})
+
 
 st.title('Kalendasz')
 
@@ -43,8 +69,7 @@ with st.form('dodaj_wydarzenie'):
     event_str_start = str(event_date) + 'T' + str(event_time)
     event_str_stop = str(event_date) + 'T' + str(event_stop_time)
     if submit_button:
-        cursor.execute("INSERT INTO kalendarz (ev_name, ev_date_start, ev_date_stop) VALUES (%s, %s, %s)", (event_name, event_str_start, event_str_stop))
-        connection.commit()
+        supabase.table('events').insert([{'event_name': event_name, 'event_date_start': event_str_start, 'event_date_end': event_str_stop}]).execute()
         st.success('Wydarzenie dodane')
         st.balloons()
         st.experimental_rerun()
@@ -70,7 +95,6 @@ calendar_options = {
     "right": "dayGridWeek, timeGridDay",
 }
 calendar_widget = calendar(events=calendar_events, options=calendar_options)
-st.write(calendar_widget)
 
 calendar_options2 = {
     "initialView": "timeGridDay",  # Set the view to "week"
