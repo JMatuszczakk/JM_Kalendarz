@@ -51,4 +51,4 @@ except:
     pass
 
 # Display the calendar widget
-st.write(calendar_widget)
+
