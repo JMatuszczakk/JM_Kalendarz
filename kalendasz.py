@@ -85,10 +85,9 @@ calendar_widget = calendar(events=calendar_events, options=calendar_options)
 calendar_options2 = {
     "initialView": "timeGridDay",  # Set the view to "week"
     "locale": "pl",                # Set locale to Polish
-    "slotMaxTime": "00:00:00",
     #set shown date to calendar_widget['dateClick']['date']
 }
-
+calendar_widget2 = calendar(events=calendar_events, options=calendar_options2)
 
 try:
     st.toast(calendar_widget['eventClick']['event']['title'])
