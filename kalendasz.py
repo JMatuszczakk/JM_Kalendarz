@@ -2,6 +2,8 @@
 import streamlit as st
 import pandas as pd
 from supabase import create_client, Client
+#import datetime
+from datetime import datetime, timedelta
 
 # Connect to the database
 
@@ -43,6 +45,25 @@ df = df.rename(columns={'event_name': 'ev_name', 'event_date_start': 'ev_date_st
 
 
 st.title('Kalendasz')
+st.subheader("Nadchodzące wydarzenia")
+upc = []
+for i in result.data:
+    #convert i['event_date_start'] to datetime
+    datetime_object = datetime.strptime(i['event_date_start'], '%Y-%m-%dT%H:%M:%S')
+    #if datetime_object is today or after:
+    if datetime_object >= datetime.today():
+        ttt = ""
+        #if date is today show "Dzisiaj, o " + time
+        #if date is tommorow show "Jutro, o " + time
+        #else show date and day of the week + time
+        if datetime_object.date() == datetime.today().date():
+            ttt = "Dzisiaj, o " + datetime_object.strftime("%H:%M")
+        elif datetime_object.date() == datetime.today().date() + timedelta(days=1):
+            ttt = "Jutro, o " + datetime_object.strftime("%H:%M")
+        else:
+            ttt = datetime_object.strftime("%A, %d %B %Y, %H:%M")
+        upc.append({'Nazwa wydażenia': i['event_name'], 'Data i czas': ttt})
+st.table(upc)
 
 with st.form('dodaj_wydarzenie'):
     st.subheader('Dodaj wydarzenie')
@@ -60,6 +81,7 @@ with st.form('dodaj_wydarzenie'):
         st.experimental_rerun()
 
 # Convert DataFrame entries to calendar_events format
+
 calendar_events = []
 for _, row in df.iterrows():
     calendar_event = {
@@ -96,7 +118,6 @@ except:
     pass
 # Create the calendar widget using the dynamically generated events and options
 
+       
 
-
-# Display the calendar widget
 
