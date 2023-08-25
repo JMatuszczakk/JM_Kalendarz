@@ -10,7 +10,7 @@ except:
     df.to_csv("calendar.csv", index=False)
 
 st.title('Kalendasz')
-
+st.write('Jeśli napis jest niewidoczny, kliknij na niego')
 with st.form('dodaj_wydarzenie'):
     st.subheader('Dodaj wydarzenie')
     event_name = st.text_input('Nazwa wydarzenia', key='event_name')
