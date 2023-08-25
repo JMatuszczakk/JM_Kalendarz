@@ -45,5 +45,10 @@ calendar_options = {
 # Create the calendar widget using the dynamically generated events and options
 calendar_widget = calendar(events=calendar_events, options=calendar_options)
 
+try:
+    st.toast(calendar_widget['eventClick']['event']['title'])
+except:
+    pass
+
 # Display the calendar widget
 st.write(calendar_widget)
