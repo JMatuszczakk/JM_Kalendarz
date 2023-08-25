@@ -8,10 +8,11 @@ from mysql.connector import Error
 # Connect to the database
 try:
     connection = mysql.connector.connect(
-        host='sql.freedb.tech',
-        user='freedb_jmatuszczak',
-        password='E!Z&2jE87Nc9CSX',
-        database='freedb_jmkalendarz',
+        host= st.secrets['host'],
+        database= st.secrets['database'],
+        user= st.secrets['user'],
+        password= st.secrets['password']
+        
 
     )
 except Error as e:
